@@ -1,0 +1,1 @@
+# SEC480-TechJournal
