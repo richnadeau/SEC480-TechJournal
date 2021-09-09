@@ -4,4 +4,4 @@
 
 ## **Course Environment**
 - [Network Map](https://github.com/richnadeau/SEC480-TechJournal/wiki/Network-Map)
-- System Inventory
+- [System Inventory](https://github.com/richnadeau/SEC480-TechJournal/wiki/Inventory)
