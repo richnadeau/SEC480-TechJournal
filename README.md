@@ -3,5 +3,5 @@
 [Chronological Journal](https://github.com/richnadeau/SEC480-TechJournal/wiki/Chronological-Journal)
 
 ## **Course Environment**
-- Network Map
-- System Inventory
+- [Network Map](https://github.com/richnadeau/SEC480-TechJournal/wiki/Network-Map)
+- [System Inventory](https://github.com/richnadeau/SEC480-TechJournal/wiki/Inventory)
