@@ -1,0 +1,8 @@
+{
+    "vcenter_server" :  "vcenter.nadeau.local",
+    "vm_host" : "super8.cyber.local",
+    "datastore" : "datastore2-super8",
+    "network" : "480-WAN",
+    "base_folder" : "BASE-VMs",
+    "snapshot" : "Based"
+}
