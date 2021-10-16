@@ -38,9 +38,9 @@ Function pick_host()
     $vspherehost = Read-Host "What server would you like to host this vm with? ["$global:config.vm_host"]"
     Read-HostDefault($vspherehost,$global:config.vm_host)
     if (!$vspherehost){
-        $vmhost = Get-VMHost -Name $global:config.vm_host
+        $global:vmhost = Get-VMHost -Name $global:config.vm_host
     } else {
-        $vmhost = Get-VMHost -Name $vspherehost
+        $global:vmhost = Get-VMHost -Name $vspherehost
     }
 }
 
@@ -55,12 +55,20 @@ Function pick_vm([string] $folder)
     }   
     $vmlist = $basefolder | Get-VM | Select-Object Name
     $vmlist
-    $newvm = Read-Host "Which VM from those listed above do you want to clone?"
+    $clonevm = Read-Host "Which VM from those listed above do you want to clone?"
     # Working on this
-    if ($newvm -NotIn $vmlist){
-        Write-Host "Please enter a valid name for the host"
+    $chosenvm = Get-VM $clonevm
+    Get-Snapshot -VM $clonevm 
+    $snapshot = Read-Host "Which Snapshot do you want to make a clone from?"
+    $clonesnapshot = Get-Snapshot -VM $clonevm -Name $snapshot
+    $linked = Read-Host "[L]inked or [F]ull Clone"
+    $vmname = Read-Host "What do you want your cloned VM to be named?"
+    if ($linked = "L"){
+        $newvm = New-VM -Name $vmname -VM $chosenvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore
+    } elseif ("F") {
+        $newvm = New-VM -Name $vmname -VM $chosenvm - -ReferenceSnapshot $clonesnapshot -
     }
-
+    $newvm
 }
 
 Function pick_datastore()
@@ -68,9 +76,9 @@ Function pick_datastore()
     $dstore = Read-Host "What datastore would you like the vm to be hosted on? ["$global:config.datastore"]"
     Read-HostDefault($dstore,$global:config.datastore)
     if (!$dstore){
-        $datastore = Get-DataStore $global:config.datastore
+        $global:datastore = Get-DataStore $global:config.datastore
     } else {
-        $datastore = Get-DataStore $dstore
+        $global:datastore = Get-DataStore $dstore
     }
 }
 
@@ -91,12 +99,13 @@ Function get-config([string] $config_path)
 
 Function cloner ($config_path)
 {
+    get-config($config_path)
     connect
-    pick_vm
     pick_host
     pick_datastore
+    pick_vm
     
 }
 
 # Temporary Main, Remove before making a module
-cloner -config_path "./480-utils.json"
+cloner -config_path "480-utils.json"
