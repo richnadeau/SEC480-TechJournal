@@ -1,11 +1,11 @@
-Function Read-HostDefault([string]$prompt, [string]$default)
+Function Read-HostDefault([string]$prompt)
 {
-    if (!$prompt) 
-    {
-        Write-Host "Using default: "$default
+    if (!$prompt){
+        Write-Host "You are using the default value."
     } else {
-        Write-Host "Using: "$prompt 
+        Write-Host "You chose:" $prompt
     }
+
 }
 
 Function connect([string] $server)
@@ -19,7 +19,7 @@ Function connect([string] $server)
     }else 
     {
         $server = Read-Host "What vCenter server would you like to connect to? ["$global:config.vcenter_server"]"
-        Read-HostDefault($vspherehost,$global:config.vcenter_server)
+        Read-HostDefault($server)
         if (!$server){
             $server = $global:config.vcenter_server
         }
@@ -35,8 +35,9 @@ Function check_index ([int]$selection,[int]$max)
 
 Function pick_host()
 {
+    Get-VMHost | Select-Object Name
     $vspherehost = Read-Host "What server would you like to host this vm with? ["$global:config.vm_host"]"
-    Read-HostDefault($vspherehost,$global:config.vm_host)
+    Read-HostDefault($vspherehost)
     if (!$vspherehost){
         $global:vmhost = Get-VMHost -Name $global:config.vm_host
     } else {
@@ -44,37 +45,59 @@ Function pick_host()
     }
 }
 
-Function pick_vm([string] $folder)
+Function pick_vm()
 {
-    $folder = Read-Host "Which folder is the VM you want to clone in? ["$global:config.base_folder"]"
-    Read-HostDefault($vspherehost,$global:config.base_folder)
+    Get-Folder | Select-Object Name
+    $prompt = Read-Host "Which folder is the VM you want to clone in? ["$global:config.base_folder"]"
+    Read-HostDefault($prompt)
     if (!$folder){
         $basefolder = Get-Folder -Name $global:config.base_folder
     } else {
         $basefolder = Get-Folder -Name $folder
     }   
-    $vmlist = $basefolder | Get-VM | Select-Object Name
-    $vmlist
-    $clonevm = Read-Host "Which VM from those listed above do you want to clone?"
-    # Working on this
-    $chosenvm = Get-VM $clonevm
-    Get-Snapshot -VM $clonevm 
-    $snapshot = Read-Host "Which Snapshot do you want to make a clone from?"
-    $clonesnapshot = Get-Snapshot -VM $clonevm -Name $snapshot
-    $linked = Read-Host "[L]inked or [F]ull Clone"
-    $vmname = Read-Host "What do you want your cloned VM to be named?"
-    if ($linked = "L"){
-        $newvm = New-VM -Name $vmname -VM $chosenvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore
-    } elseif ("F") {
-        $newvm = New-VM -Name $vmname -VM $chosenvm - -ReferenceSnapshot $clonesnapshot -
+    $vmlist = $basefolder | Get-VM 
+    $numba = -1
+    foreach ($vm in $vmlist)
+    {
+        $numba = $numba + 1
+        Write-Host "$numba. " $vm.Name
     }
-    $newvm
+    $clonevm = Read-Host "Which VM from those listed above do you want to clone?"
+    $selectedvm = $vmlist[$clonevm]
+    # Working on this
+    $selectedvm = Get-VM $selectedvm
+    Get-Snapshot -VM $selectedvm | Select-Object Name
+    $snapshot = Read-Host "Which Snapshot do you want to make a clone from?"
+    $clonesnapshot = Get-Snapshot -VM $selectedvm -Name $snapshot
+    $vmname = Read-Host "What do you want your cloned VM to be named? ["$selectedvm.name".linked]"
+    if (!$vmname){
+        $vmname = "{0}.linked" -f $selectedvm.name
+    }
+    Read-HostDefault($vmname)
+    $linked = Read-Host "[L]inked or [F]ull Clone"
+    if ($linked -match "L"){
+        Write-Host ("You have selected  to have a Linked Clone")
+        $global:newvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore 
+    } elseif ($linked -match "F") {
+        Write-Host ("You have selected  to have a Full Clone")
+        $fullclonename = Read-Host "What do you want your fully cloned VM to be called? ["$selectedvm.name".base]"
+        Read-HostDefault($fullclonename)
+        if (!$fullclonename){
+            $fullclonename = "{0}.base" -f $selectedvm.name
+        }
+        $linkedvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore
+        $global:newvm = New-VM -Name $fullclonename -VM $linkedvm -VMHost $global:vmhost -Datastore $global:datastore
+    } else {
+        Write-Host ("Sorry that was not a valid option, please run the script again.") -BackgroundColor Red
+        Break
+    }
 }
 
 Function pick_datastore()
 {
+    Get-Datastore | Select-Object Name
     $dstore = Read-Host "What datastore would you like the vm to be hosted on? ["$global:config.datastore"]"
-    Read-HostDefault($dstore,$global:config.datastore)
+    Read-HostDefault($dstore)
     if (!$dstore){
         $global:datastore = Get-DataStore $global:config.datastore
     } else {
@@ -82,14 +105,14 @@ Function pick_datastore()
     }
 }
 
-Function pick_network([string] $vmhost_name)
+Function pick_network()
 {
     $network = Read-Host "What network would you like the vm to be on? ["$global:config.network"]"
-    Read-HostDefault($network,$global:config.network)
+    Read-HostDefault($network)
     if (!$network){
         $network = $global:config.network
     }
-    $vmhost_name | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $network -Confirm:$false
+    $global:newvm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $network -Confirm:$false
 }
 
 Function get-config([string] $config_path)
@@ -104,7 +127,7 @@ Function cloner ($config_path)
     pick_host
     pick_datastore
     pick_vm
-    
+    pick_network
 }
 
 # Temporary Main, Remove before making a module
