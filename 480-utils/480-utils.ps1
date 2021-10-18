@@ -28,11 +28,6 @@ Function connect([string] $server)
     return $conn
 } 
 
-Function check_index ([int]$selection,[int]$max)
-{
-
-}
-
 Function pick_host()
 {
     Get-VMHost | Select-Object Name
@@ -77,7 +72,7 @@ Function pick_vm()
     $linked = Read-Host "[L]inked or [F]ull Clone"
     if ($linked -match "L"){
         Write-Host ("You have selected  to have a Linked Clone")
-        $global:newvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore 
+        $global:newvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore -Location $basefolder 
     } elseif ($linked -match "F") {
         Write-Host ("You have selected  to have a Full Clone")
         $fullclonename = Read-Host "What do you want your fully cloned VM to be called? ["$selectedvm.name".base]"
@@ -85,8 +80,8 @@ Function pick_vm()
         if (!$fullclonename){
             $fullclonename = "{0}.base" -f $selectedvm.name
         }
-        $linkedvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore
-        $global:newvm = New-VM -Name $fullclonename -VM $linkedvm -VMHost $global:vmhost -Datastore $global:datastore
+        $linkedvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore -Location $basefolder
+        $global:newvm = New-VM -Name $fullclonename -VM $linkedvm -VMHost $global:vmhost -Datastore $global:datastore -Location $basefolder
     } else {
         Write-Host ("Sorry that was not a valid option, please run the script again.") -BackgroundColor Red
         Break
