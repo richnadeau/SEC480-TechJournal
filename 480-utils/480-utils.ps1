@@ -47,9 +47,9 @@ Function pick_host()
 
 Function pick_vm()
 {
-    Get-Folder | Select-Object Name
-    $prompt = Read-Host "Which folder is the VM you want to clone in? ["$global:config.base_folder"]"
-    Read-HostDefault($prompt)
+    Get-Folder -Type VM | Select-Object Name
+    $folder = Read-Host "Which folder is the VM you want to clone in? ["$global:config.base_folder"]"
+    Read-HostDefault($folder)
     if (!$folder){
         $basefolder = Get-Folder -Name $global:config.base_folder
     } else {
