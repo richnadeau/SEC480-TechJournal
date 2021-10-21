@@ -168,7 +168,7 @@ Function setNetwork([string] $vmName, [string] $networkName, [string] $vcenter_s
         Write-Host -ForegroundColor Red "Please put in a value for the -networkName parameter!"
         Break
     }
-
+    get-config("480-utils.json")
     connect($vcenter_server)
     $networkadapterlist = Get-NetworkAdapter -VM $vmName
     foreach ($networkadapter in $networkadapterlist) { 
@@ -186,8 +186,15 @@ Function setNetwork([string] $vmName, [string] $networkName, [string] $vcenter_s
     }
 }
 
+Function getIP ([string] $vmName, [string] $vcenter_server) {
+
+    
+
+}
+
 # Temporary Main, Remove before making a module
 # createNetwork -networkName "BLUE8-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server "vcenter.nadeau.local"
 # cloner -config_path "480-utils.json"
-# startVMs -Name blue8-fw -vcenter_server "vcenter.nadeau.local" -Force $true
-# setNetwork -vmName blue8-fw -networkName "480-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server vcenter.nadeau.local
+# startVMs -Name blue8-fw -vcenter_server vcenter.nadeau.local -Force $true
+# setNetwork -vmName blue8-fw -networkName BLUE8-WAN -vcenter_server vcenter.nadeau.local
+# getIP -vmName blue8-fw -vcenter_server vcenter.nadeau.local
