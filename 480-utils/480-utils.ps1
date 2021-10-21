@@ -84,7 +84,7 @@ Function pick_vm()
         $linkedvm = New-VM -Name $vmname -VM $selectedvm -LinkedClone -ReferenceSnapshot $clonesnapshot -VMHost $global:vmhost -Datastore $global:datastore -Location $basefolder
         $global:newvm = New-VM -Name $fullclonename -VM $linkedvm -VMHost $global:vmhost -Datastore $global:datastore -Location $basefolder
     } else {
-        Write-Host ("Sorry that was not a valid option, please run the script again.") -BackgroundColor Red
+        Write-Host ("Sorry that was not a valid option, please run the script again.") -ForegroundColor Red
         Break
     }
 }
@@ -130,7 +130,7 @@ Function cloner ($config_path)
 
 Function createNetwork ([string] $networkName, [string] $esxi_host_name, [string] $vcenter_server) {
     if(!$networkName) {
-        Write-Host -BackgroundColor Red "Please put in a value for the -networkName parameter!"
+        Write-Host -ForegroundColor Red "Please put in a value for the -networkName parameter!"
         Break
     }
     get-config("480-utils.json")
@@ -147,7 +147,7 @@ Function createNetwork ([string] $networkName, [string] $esxi_host_name, [string
 
 Function startVMs ([string] $Name, [string] $vcenter_server, [Boolean] $Force) {
     if(!$Name) {
-        Write-Host -BackgroundColor Red "Please put in a value for the -Name parameter!"
+        Write-Host -ForegroundColor Red "Please put in a value for the -Name parameter!"
         Break
     }
     get-config("480-utils.json")
@@ -160,7 +160,34 @@ Function startVMs ([string] $Name, [string] $vcenter_server, [Boolean] $Force) {
     }
 }
 
+Function setNetwork([string] $vmName, [string] $networkName, [string] $vcenter_server) {
+    if(!$vmName) {
+        Write-Host -ForegroundColor Red "Please put in a value for the -vmName parameter!"
+        Break
+    } elseif (!$networkName) {
+        Write-Host -ForegroundColor Red "Please put in a value for the -networkName parameter!"
+        Break
+    }
+
+    connect($vcenter_server)
+    $networkadapterlist = Get-NetworkAdapter -VM $vmName
+    foreach ($networkadapter in $networkadapterlist) { 
+        $response = Read-Host "Would you like to set"$networkadapter.Name"to be on the"$networkName "network? (Y/N)"
+        if($response -eq "y") {
+            Write-Host = -ForegroundColor Green "Changing this network adapter to be on "$networkadapter
+            Set-NetworkAdapter -NetworkAdapter $networkadapter -NetworkName $networkName -Confirm:$false
+        } elseif ($response -eq "n") {
+            Write-Host = -ForegroundColor Green "Keeping this network adapter the same"
+        } else {
+            Write-Host = -ForegroundColor Red "Not a valid answer. Run this function again."
+            Break
+        }
+
+    }
+}
+
 # Temporary Main, Remove before making a module
-# createNetwork -networkName "BLUE1-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server "vcenter.nadeau.local"
+# createNetwork -networkName "BLUE8-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server "vcenter.nadeau.local"
 # cloner -config_path "480-utils.json"
 # startVMs -Name blue8-fw -vcenter_server "vcenter.nadeau.local" -Force $true
+# setNetwork -vmName blue8-fw -networkName "480-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server vcenter.nadeau.local
