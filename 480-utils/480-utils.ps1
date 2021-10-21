@@ -60,7 +60,10 @@ Function pick_vm()
     # Working on this
     $selectedvm = Get-VM $selectedvm
     Get-Snapshot -VM $selectedvm | Select-Object Name
-    $snapshot = Read-Host "Which Snapshot do you want to make a clone from?"
+    $snapshot = Read-Host "Which Snapshot do you want to make a clone from? ["$global:config.snapshot"]"
+    if(!$snapshot){
+        $snapshot = Get-Snapshot -VM $selectedvm -Name $global:config.snapshot
+    }
     $clonesnapshot = Get-Snapshot -VM $selectedvm -Name $snapshot
     $vmname = Read-Host "What do you want your cloned VM to be named? ["$selectedvm.name".linked]"
     if (!$vmname){
