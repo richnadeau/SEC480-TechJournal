@@ -145,6 +145,22 @@ Function createNetwork ([string] $networkName, [string] $esxi_host_name, [string
 
 }
 
+Function startVMs ([string] $Name, [string] $vcenter_server, [Boolean] $Force) {
+    if(!$Name) {
+        Write-Host -BackgroundColor Red "Please put in a value for the -Name parameter!"
+        Break
+    }
+    get-config("480-utils.json")
+    connect($vcenter_server)
+    if ($Force -match $true){
+        Start-VM -VM $Name 
+    }
+    else {
+        Start-VM -VM $Name -Confirm
+    }
+}
+
 # Temporary Main, Remove before making a module
 # createNetwork -networkName "BLUE1-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server "vcenter.nadeau.local"
 # cloner -config_path "480-utils.json"
+# startVMs -Name blue8-fw -vcenter_server "vcenter.nadeau.local" -Force $true
