@@ -17,9 +17,7 @@ Function connect([string] $server)
 
         Write-Host $msg
     }else 
-    {
-        $server = Read-Host "What vCenter server would you like to connect to? ["$global:config.vcenter_server"]"
-        Read-HostDefault($server)
+    {     
         if (!$server){
             $server = $global:config.vcenter_server
         }
@@ -118,12 +116,32 @@ Function get-config([string] $config_path)
 Function cloner ($config_path)
 {
     get-config($config_path)
-    connect
+    $server = Read-Host "What vCenter server would you like to connect to? ["$global:config.vcenter_server"]"
+    Read-HostDefault($server)
+    connect($server)
     pick_host
     pick_datastore
     pick_vm
     pick_network
 }
 
+Function createNetwork ([string] $networkName, [string] $esxi_host_name, [string] $vcenter_server) {
+    if(!$networkName) {
+        Write-Host -BackgroundColor Red "Please put in a value for the -networkName parameter!"
+        Break
+    }
+    get-config("480-utils.json")
+    connect($vcenter_server)
+    if(!$esxi_host_name){
+        New-VirtualSwitch -Name $networkName -VMHost $global:config.vm_host
+    } elseif($esxi_host_name) {
+        New-VirtualSwitch -Name $networkName -VMHost $esxi_host_name
+    }
+    New-VirtualPortGroup -Name $networkName -VirtualSwitch $networkName
+    
+
+}
+
 # Temporary Main, Remove before making a module
-cloner -config_path "480-utils.json"
+# createNetwork -networkName "BLUE1-WAN" -esxi_host_name "super8.cyber.local" -vcenter_server "vcenter.nadeau.local"
+# cloner -config_path "480-utils.json"
