@@ -187,8 +187,16 @@ Function setNetwork([string] $vmName, [string] $networkName, [string] $vcenter_s
 }
 
 Function getIP ([string] $vmName, [string] $vcenter_server) {
+    if(!$vmName) {
+        Write-Host -ForegroundColor Red "Please put in a value for the -vmName parameter!"
+        Break
+    }
+    get-config("480-utils.json")
+    connect($vcenter_server)
 
-    
+    $vm = Get-VM -Name $vmName
+    $vm.guest.IPAddress[0]
+
 
 }
 
