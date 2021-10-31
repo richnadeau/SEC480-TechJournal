@@ -1,22 +1,19 @@
 linux:
   hosts:
   children:
-    centos:
+    ubuntu:
       hosts:
-        10.0.5.75:
-          hostname: centos-1
-          lan_ip: 10.0.5.10
-        10.0.5.76:
-          hostname: centos-2
-          lan_ip: 10.0.5.11
-        10.0.5.77: 
-          hostname: centos-3
-          lan_ip: 10.0.5.12
+        10.0.5.80:
+          hostname: ubuntu-1
+          lan_ip: 10.0.5.13
+        10.0.5.81:
+          hostname: ubuntu-2
+          lan_ip: 10.0.5.14
         
   vars:
     public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDaOKw0WFRwXvHv4PJTtBj7bk8f91x3hKecjs8U2Xw3B51+kPR7dP1c2fcGHoVrIIOvwYlngJUP/002BqjrlrWh03hu1CfPaEYE3lkJKY8HBONAP0Ft3hIDXKNWPNBnQTWGuXSWnnN5G4i1sWojoG9uzF8UuhSkKF7JCRj5sPQ4iRJjsLz0KvhX9K3KyMSsxst89miMo61JcerXeMPlb/BygYx2usKcIsrgXCl63rg3mAgAu1XpSJRMyBIDsQ/u+ieKomy4Xjj7xpYdIrtwfGOLlkEb2rSHLLQ1HlGMqNsFn6Cs4s9XEtkODWaHn015H+qvKHJns0AwnsIXX/CfG6hHvQbFSCAx8wS5KFYgmlIddPE2SukgxtwCdQ1WJ+J1ZAQJZPCPFEHCS0scBa2AosfHEZU97qiejWsbW7uUJEELuSYxv16JN5652DgZLbP2UEJ0heAgSBTNdL/nMi2FKcF8XHDQEo0UP+IAkMs1icO9PbYUuCxIh8YcIAbG+moLMi0= starlord@xubuntu-wan-starlord"
     ansible_user: deployer
-    device: ens192
+    device: ens160
     prefix: 24
     gateway: 10.0.5.2
     name_server: 10.0.5.5
