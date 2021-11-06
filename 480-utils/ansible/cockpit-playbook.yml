@@ -72,6 +72,16 @@
       shell: systemctl start cockpit
       become: yes
 
+    - name: install cockpit dashboard
+      yum:
+        name: cockpit-dashboard
+        state: present
+      become: yes
+
+    - name: restart cockpit
+      shell: systemctl restart cockpit
+      become: yes
+
     - name: bounce the network
       shell: "sleep 5 && systemctl restart network"
       become: yes

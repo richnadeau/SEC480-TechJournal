@@ -3,10 +3,10 @@ linux:
   children:
     ubuntu:
       hosts:
-        10.0.5.80:
+        10.0.5.81:
           hostname: ubuntu-1
           lan_ip: 10.0.5.13
-        10.0.5.81:
+        10.0.5.85:
           hostname: ubuntu-2
           lan_ip: 10.0.5.14
         

@@ -50,8 +50,19 @@
         force: yes
       become: yes
 
-    - name: reboot the box for hostname to change
-      shell: "reboot"
+    - name: install cockpit
+      shell: apt-get install cockpit -y
       become: yes
+
+    - name: enable cockpit
+      shell: systemctl enable cockpit
+      become: yes
+
+    - name: start cockpit
+      shell: systemctl start cockpit
+      become: yes
+
+    - name: reboot the box for hostname to change
+      reboot:
 
       

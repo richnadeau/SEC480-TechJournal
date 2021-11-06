@@ -50,9 +50,31 @@
         force: yes
       become: yes
 
+
+    - name: installing cockpit
+      yum:
+        name: cockpit
+        state: present
+      become: yes
+      
+    - name: adding cockpit to firewall
+      shell: firewall-cmd --add-service=cockpit --permanent
+      become: yes
+
+    - name: reload firewall
+      shell: firewall-cmd --reload
+      become: yes
+
+    - name: enable cockpit
+      shell: systemctl enable cockpit
+      become: yes
+
+    - name: start cockpit
+      shell: systemctl start cockpit
+      become: yes
+
     - name: bounce the network
       shell: "sleep 5 && systemctl restart network"
       become: yes
       async: 1
       poll: 0
-      
