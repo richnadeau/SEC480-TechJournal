@@ -1,0 +1,48 @@
+- name: Create Blue Team OUs
+  hosts: 10.0.5.5
+  gather_facts: no
+  vars_prompt:
+    - name: OU_NAME
+      prompt: "what will be the new blue team OU be called?"
+      private: no
+    - name: OU_PATH
+      prompt: "where will the OU be located (Please use correct OU path format e.g. DC=blue8, DC=local)?"
+      private: no
+
+  tasks:
+    - win_shell: install-packageprovider -name nuget -force
+    - name: "Install XactiveDirectory"
+      win_psmodule:
+        name: ActiveDirectoryDSC
+        state: present
+    - name: "Create New OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "{{ OU_NAME }}"
+        path: "{{ OU_PATH }}"
+    - name: "Create Accounts OU in New OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "Accounts"
+        path: "OU={{ OU_NAME }},{{ OU_PATH }}"
+    - name: "Create Groups OU in New Accounts OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "Groups"
+        path: "OU=Accounts, OU={{ OU_NAME }},{{ OU_PATH }}"
+    - name: "Create Computers OU in New OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "Computers"
+        path: "OU={{ OU_NAME }},{{ OU_PATH }}"
+    - name: "Create Servers OU in New Computers OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "Servers"
+        path: "OU=Computers, OU={{ OU_NAME }}, {{ OU_PATH }}"
+    - name: "Create Workstations OU in New Computers OU"
+      win_dsc:
+        resource_name: ADOrganizationalUnit
+        name: "Workstations"
+        path: "OU=Computers, OU={{ OU_NAME }}, {{ OU_PATH }}"
+  
