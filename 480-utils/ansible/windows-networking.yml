@@ -1,0 +1,37 @@
+# This playbook configures blueteam windows static networking for DC
+
+- name: windows-networking
+  hosts: servers
+  gather_facts: no
+  vars_prompt:
+  - name: adminpass
+    prompt: "What do you want your admin password to be?"
+    private: yes
+
+  tasks:
+    - name: set local admin
+      win_user:
+        name: Administrator
+        password: "{{ adminpass }}"
+        state: present
+        password_never_expires: yes
+
+    - name: change time zone
+      win_timezone:
+        timezone: Eastern Standard Time
+      register: timezone
+
+    - name: create a deploy directory
+      win_file:
+        path: C:\480
+        state: directory
+    - name: load from jinja template
+      win_template:
+        src: files/dhcp-to-static.ps1.j2
+        dest: C:\480\dhcp-to-static.ps1
+    - name: run script
+      async: 10
+      poll: 0
+      win_shell:
+        C:\480\dhcp-to-static.ps1
+
