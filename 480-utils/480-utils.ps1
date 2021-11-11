@@ -196,6 +196,8 @@ Function getIP ([string] $vmName, [string] $vcenter_server) {
 
     $vm = Get-VM -Name $vmName
     $vm.guest.IPAddress[0]
+    $netadapter = Get-NetworkAdapter -VM $vm
+    $netadapter.MacAddress
 
 
 }
