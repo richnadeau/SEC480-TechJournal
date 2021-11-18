@@ -19,7 +19,7 @@
         state: domain
         dns_domain_name: "{{ domain }}"
         domain_admin_user: "{{ domainadminuser }}"
-        domain_admin_password: "{{ domainadminpass }}"ssh 
+        domain_admin_password: "{{ domainadminpass }}"
         domain_ou_path: OU=Servers,OU=Computers,OU=blue8,DC=blue8,DC=local
       register: domain_join_state
 
@@ -28,4 +28,4 @@
       win_reboot:
         msg: "Domain Join in process; rebooting..."
         # Tests to see if Server Core is back up
-        test_command: 'exit (Get-Service -Name DNS).Status -ne "Running"'
+        test_command: 'hostname'
