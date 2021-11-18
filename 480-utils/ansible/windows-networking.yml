@@ -16,6 +16,11 @@
         state: present
         password_never_expires: yes
 
+    - name: change hostname
+      win_hostname:
+        name: "{{ hostname }}"
+      register: res
+
     - name: change time zone
       win_timezone:
         timezone: Eastern Standard Time

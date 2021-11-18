@@ -1,0 +1,31 @@
+- name: Join to Blue Team Domain
+  hosts: 10.0.5.6
+  gather_facts: no
+  vars_prompt:
+    - name: domainadminuser
+      prompt: "Domain Admin User:"
+      private: no
+    - name: domainadminpass
+      prompt: "Domain Admin Password:"
+      private: yes  
+
+  tasks:
+    - name: Change DNS Server to blue8-dc
+      win_shell:
+        netsh interface ip set dns name="{{ device }}" static "{{ name_server }}"
+
+    - name: Join Blue Domain
+      win_domain_membership:
+        state: domain
+        dns_domain_name: "{{ domain }}"
+        domain_admin_user: "{{ domainadminuser }}"
+        domain_admin_password: "{{ domainadminpass }}"ssh 
+        domain_ou_path: OU=Servers,OU=Computers,OU=blue8,DC=blue8,DC=local
+      register: domain_join_state
+
+    - name: Reboot after creation
+      when: domain_join_state.reboot_required
+      win_reboot:
+        msg: "Domain Join in process; rebooting..."
+        # Tests to see if Server Core is back up
+        test_command: 'exit (Get-Service -Name DNS).Status -ne "Running"'
