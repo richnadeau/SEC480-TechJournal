@@ -1,15 +1,27 @@
 - name: Join to Blue Team Domain
-  hosts: 10.0.5.6
+  hosts: workstations
   gather_facts: no
   vars_prompt:
     - name: domainadminuser
-      prompt: "Domain Admin User:"
+      prompt: "Domain Admin User"
       private: no
     - name: domainadminpass
-      prompt: "Domain Admin Password:"
+      prompt: "Domain Admin Password"
       private: yes  
 
   tasks:
+    - name: change hostname
+      win_hostname:
+        name: "{{ hostname }}"
+      register: res
+
+    - name: Reboot after rename
+      when: res.reboot_required
+      win_reboot:
+        msg: "Renaming in process; rebooting..."
+        # Tests to see if Server Core is back up
+        test_command: 'hostname'
+
     - name: Change DNS Server to blue8-dc
       win_shell:
         netsh interface ip set dns name="{{ device }}" static "{{ name_server }}"

@@ -7,7 +7,13 @@ windows:
           hostname: dc-blue8
         10.0.5.6:
           hostname: fs-blue8
-          
+    workstations:
+      hosts:
+        10.0.5.89:
+          hostname: ws1-blue8
+        10.0.5.88:
+          hostname: ws2-blue8
+
   vars:
     ansible_user: deployer
     device: Ethernet0
