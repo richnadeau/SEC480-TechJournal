@@ -32,7 +32,7 @@
         dns_domain_name: "{{ domain }}"
         domain_admin_user: "{{ domainadminuser }}"
         domain_admin_password: "{{ domainadminpass }}"
-        domain_ou_path: OU=Servers,OU=Computers,OU=blue8,DC=blue8,DC=local
+        domain_ou_path: OU=Workstations,OU=Computers,OU=blue8,DC=blue8,DC=local
       register: domain_join_state
 
     - name: Reboot after creation
