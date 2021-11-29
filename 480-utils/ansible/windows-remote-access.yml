@@ -4,7 +4,7 @@
 
   tasks:
     - name: RDP
-      windows_remote_desktop_enabled: true
+      win_shell: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
 
     - name: Allow List
       win_group_membership:
