@@ -1,0 +1,33 @@
+- name: windows-remote-access
+  hosts: workstations
+  gather_facts: no
+
+  tasks:
+    - name: RDP
+      windows_remote_desktop_enabled: true
+
+    - name: Allow List
+      win_group_membership:
+        name: Remote Desktop Users
+        members:
+          - BLUE8\Domain Admins
+        state: present
+
+    - name: RDP Enable
+      win_service:
+        name: TermService
+        state: started
+
+    - name: RDP Firewall
+      win_firewall_rule:
+        name: Remote Desktop
+        localport: 3389
+        action: allow
+        direction: in
+        protocol: tcp
+        state: present
+        enabled: yes
+
+    - name: High Performance
+      win_power_plan:
+        name: high performance

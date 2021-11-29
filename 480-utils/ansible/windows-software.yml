@@ -1,0 +1,47 @@
+---
+- name: install software
+  hosts: workstations
+  gather_facts: no
+  tasks:
+    - name: create directory
+      win_file:
+        path: C:\480
+        state: directory
+
+    - name: copy chrome msi
+      win_copy:
+        src: files/googlechromestandaloneenterprise64.msi
+        dest: C:\480\googlechromestandaloneenterprise64.msi
+        
+    - name: install chrome
+      win_package:
+        path: C:\480\googlechromestandaloneenterprise64.msi
+        wait: yes
+        state: present
+    
+    - name: copy putty msi
+      win_copy:
+        src: files/putty-64bit-0.76-installer.msi
+        dest: C:\480\putty-64bit-0.76-installer.msi
+
+    - name: install putty
+      win_package:
+        path: C:\480\putty-64bit-0.76-installer.msi
+        wait: yes
+        state: present
+
+    - name: copy slack msi
+      win_copy:
+        src: files/slack-standalone-4.22.0.0.msi
+        dest: C:\480\slack-standalone-4.22.0.0.msi
+
+    - name: install slack
+      win_package:
+        path: C:\480\slack-standalone-4.22.0.0.msi
+        wait: yes
+        state: present
+
+    - name: cleanup 480 directory
+      win_file:
+        path: C:\480
+        state: absent
